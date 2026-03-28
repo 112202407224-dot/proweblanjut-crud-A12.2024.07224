@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+// Proteksi halaman - cek sesi login
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
+}
+
 include 'koneksi.php';
 
 $stmt = $pdo->query("SELECT * FROM barang");
@@ -14,10 +22,36 @@ $totalNilai  = array_sum(array_map(fn($r) => $r['harga'] * $r['jumlah'], $data))
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inventaris Barang</title>
-
-<!-- HUBUNGKAN CSS -->
 <link rel="stylesheet" href="style.css">
-
+<style>
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .welcome-text {
+        font-size: 13px;
+        color: #888;
+    }
+    .welcome-text span {
+        font-weight: 600;
+        color: #c9a84c;
+    }
+    .btn-logout {
+        padding: 8px 16px;
+        background: transparent;
+        border: 1px solid #c0392b;
+        color: #c0392b;
+        border-radius: 4px;
+        font-size: 13px;
+        text-decoration: none;
+        transition: background 0.2s, color 0.2s;
+    }
+    .btn-logout:hover {
+        background: #c0392b;
+        color: #fff;
+    }
+</style>
 </head>
 <body>
 
@@ -32,11 +66,14 @@ $totalNilai  = array_sum(array_map(fn($r) => $r['harga'] * $r['jumlah'], $data))
       </div>
     </div>
 
-    <a href="tambah.php" class="btn-add">
-      Tambah Barang
-    </a>
+    <div class="topbar-right">
+      <div class="welcome-text">
+        Selamat datang, <span><?= htmlspecialchars($_SESSION['username']) ?></span>
+      </div>
+      <a href="tambah.php" class="btn-add">Tambah Barang</a>
+      <a href="logout.php" class="btn-logout">Logout</a>
+    </div>
   </div>
-
 
   <div class="stats">
     <div class="stat">
@@ -44,25 +81,19 @@ $totalNilai  = array_sum(array_map(fn($r) => $r['harga'] * $r['jumlah'], $data))
       <div class="stat-value"><?= $totalBarang ?></div>
       <div class="stat-sub">item terdaftar</div>
     </div>
-
     <div class="stat">
       <div class="stat-label">Total Stok</div>
       <div class="stat-value"><?= number_format($totalStok,0,',','.') ?></div>
       <div class="stat-sub">unit tersedia</div>
     </div>
-
     <div class="stat">
       <div class="stat-label">Total Nilai</div>
-      <div class="stat-value">
-        Rp <?= number_format($totalNilai,0,',','.') ?>
-      </div>
+      <div class="stat-value">Rp <?= number_format($totalNilai,0,',','.') ?></div>
       <div class="stat-sub">nilai inventaris</div>
     </div>
   </div>
 
-
   <div class="card">
-
     <div class="card-head">
       <div class="card-title">
         <span class="dot"></span>
@@ -71,65 +102,42 @@ $totalNilai  = array_sum(array_map(fn($r) => $r['harga'] * $r['jumlah'], $data))
       <span class="badge"><?= $totalBarang ?> data</span>
     </div>
 
-<?php if(empty($data)): ?>
+    <?php if(empty($data)): ?>
+      <div class="empty">📭 Belum ada data barang</div>
+    <?php else: ?>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nama Barang</th>
+            <th>Jumlah</th>
+            <th>Harga</th>
+            <th>Tanggal</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach($data as $row): ?>
+          <tr>
+            <td>#<?= $row['id'] ?></td>
+            <td><?= htmlspecialchars($row['nama_barang']) ?></td>
+            <td><?= number_format($row['jumlah']) ?></td>
+            <td>Rp <?= number_format($row['harga']) ?></td>
+            <td><?= date('d M Y', strtotime($row['tanggal_masuk'])) ?></td>
+            <td>
+              <a href="edit.php?id=<?= $row['id'] ?>" class="btn-edit">Edit</a>
+              <a href="hapus.php?id=<?= $row['id'] ?>" class="btn-del"
+                 onclick="return confirm('Yakin hapus data?')">Hapus</a>
+            </td>
+          </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    <?php endif; ?>
+  </div>
 
-<div class="empty">
-📭 Belum ada data barang
-</div>
-
-<?php else: ?>
-
-<table>
-<thead>
-<tr>
-<th>ID</th>
-<th>Nama Barang</th>
-<th>Jumlah</th>
-<th>Harga</th>
-<th>Tanggal</th>
-<th>Aksi</th>
-</tr>
-</thead>
-
-<tbody>
-
-<?php foreach($data as $row): ?>
-
-<tr>
-<td>#<?= $row['id'] ?></td>
-
-<td><?= htmlspecialchars($row['nama_barang']) ?></td>
-
-<td><?= number_format($row['jumlah']) ?></td>
-
-<td>Rp <?= number_format($row['harga']) ?></td>
-
-<td><?= date('d M Y',strtotime($row['tanggal_masuk'])) ?></td>
-
-<td>
-<a href="edit.php?id=<?= $row['id'] ?>" class="btn-edit">Edit</a>
-<a href="hapus.php?id=<?= $row['id'] ?>" class="btn-del"
-onclick="return confirm('Yakin hapus data?')">
-Hapus
-</a>
-</td>
-
-</tr>
-
-<?php endforeach; ?>
-
-</tbody>
-</table>
-
-<?php endif; ?>
+  <div class="footer"></div>
 
 </div>
-
-<div class="footer">
-
-</div>
-
-</div>
-
 </body>
 </html>
