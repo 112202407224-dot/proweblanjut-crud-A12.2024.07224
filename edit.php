@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
+}
 include 'koneksi.php';
 
 $id = (int) ($_GET['id'] ?? 0);
@@ -533,6 +538,9 @@ $val = [
   </div>
 
 </div>
+
+</body>
+</html>
 
 </body>
 </html>
