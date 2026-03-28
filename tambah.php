@@ -1,7 +1,11 @@
 <?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
+}
 include 'koneksi.php';
 
-$success = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -53,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     overflow-x: hidden;
   }
 
-  /* Grid background — sama seperti index */
   body::before {
     content: '';
     position: fixed;
@@ -85,7 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     margin: 0 auto;
   }
 
-  /* Back link */
   .back-link {
     display: inline-flex;
     align-items: center;
@@ -96,15 +98,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     margin-bottom: 32px;
     transition: color 0.2s;
   }
-
   .back-link:hover { color: var(--text); }
+  .back-link::before { content: '←'; font-size: 16px; }
 
-  .back-link::before {
-    content: '←';
-    font-size: 16px;
-  }
-
-  /* Page heading */
   .page-tag {
     font-size: 11px;
     font-weight: 500;
@@ -116,7 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     align-items: center;
     gap: 8px;
   }
-
   .page-tag::before {
     content: '';
     display: block;
@@ -141,7 +136,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     animation: slideDown 0.5s 0.05s ease both;
   }
 
-  /* Card */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -181,7 +175,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     gap: 20px;
   }
 
-  /* Alert */
   .alert-error {
     background: rgba(248,81,73,0.1);
     border: 1px solid rgba(248,81,73,0.3);
@@ -193,10 +186,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     align-items: center;
     gap: 8px;
   }
-
   .alert-error::before { content: '⚠'; }
 
-  /* Form group */
   .form-group {
     display: flex;
     flex-direction: column;
@@ -216,11 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     text-transform: uppercase;
     color: var(--muted);
   }
-
-  label span {
-    color: var(--red);
-    margin-left: 2px;
-  }
+  label span { color: var(--red); margin-left: 2px; }
 
   input[type="text"],
   input[type="number"],
@@ -238,39 +225,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     appearance: none;
     -webkit-appearance: none;
   }
-
   input:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(63,185,80,0.12);
   }
-
   input::placeholder { color: #4a5568; }
-
-  /* Date input fix */
   input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(0.5);
     cursor: pointer;
   }
 
-  /* Hint */
-  .hint {
-    font-size: 11px;
-    color: var(--muted);
-  }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 
-  /* Divider */
-  .divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 4px 0;
-  }
-
-  /* Actions */
-  .form-actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-  }
+  .form-actions { display: flex; gap: 12px; align-items: center; }
 
   .btn-submit {
     flex: 1;
@@ -288,20 +255,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     position: relative;
     overflow: hidden;
   }
-
   .btn-submit::before {
     content: '';
     position: absolute;
     inset: 0;
     background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
   }
-
   .btn-submit:hover {
     background: var(--accent-hover);
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(63,185,80,0.3);
   }
-
   .btn-submit:active { transform: translateY(0); }
 
   .btn-cancel {
@@ -316,23 +280,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     transition: all 0.2s;
     white-space: nowrap;
   }
+  .btn-cancel:hover { border-color: var(--text); color: var(--text); }
 
-  .btn-cancel:hover {
-    border-color: var(--text);
-    color: var(--text);
-  }
-
-  /* Animations */
   @keyframes slideDown {
     from { opacity: 0; transform: translateY(-16px); }
     to { opacity: 1; transform: translateY(0); }
   }
-
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
-
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.3; }
@@ -362,12 +319,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
     <div class="card-body">
 
-      <?php if($error): ?>
+      <?php if ($error): ?>
       <div class="alert-error"><?= htmlspecialchars($error) ?></div>
       <?php endif; ?>
 
       <form method="POST" action="">
-
         <div style="display:flex;flex-direction:column;gap:20px;">
 
           <div class="form-group">
@@ -406,12 +362,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
 
         </div>
-
       </form>
+
     </div>
   </div>
 
 </div>
+
+</body>
+</html>
 
 </body>
 </html>
